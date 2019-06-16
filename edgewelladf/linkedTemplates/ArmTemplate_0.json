@@ -1,0 +1,419 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "edgewelladf"
+		},
+		"integrationRuntime_edgewellIR": {
+			"type": "string",
+			"metadata": "Integration Runtime Name",
+			"defaultValue": "edgewellIR"
+		},
+		"integrationRuntime_edgewellIntegrationRuntime": {
+			"type": "string",
+			"metadata": "Integration Runtime Name",
+			"defaultValue": "edgewellIntegrationRuntime"
+		},
+		"AzureDataLakeStorageGen2_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageGen2'"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
+		"onpremSQL_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'onpremSQL'"
+		},
+		"SqlServer1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
+		},
+		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://edgewellsta.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_edgewellIR'))]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "Central US",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLiveInMinutes": 60
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorageGen2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorageGen2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorageGen2_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/onpremSQL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('onpremSQL_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlServer1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLTarget')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": "dbo.testtable"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquetsink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageGen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"container": "data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "ID",
+						"type": "UTF8"
+					},
+					{
+						"name": "First_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Last_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Date",
+						"type": "UTF8"
+					},
+					{
+						"name": "Zipcode",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageGen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ContosoSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageGen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Contoso",
+						"container": "data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageGen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLDfTransformation')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Parquetsink",
+								"type": "DatasetReference"
+							},
+							"name": "ParquetSource",
+							"typeProperties": {},
+							"script": "source(output(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SQLTarget",
+								"type": "DatasetReference"
+							},
+							"name": "sink1",
+							"script": "DerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1",
+							"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn1"
+						}
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Parquetsink')]",
+				"[concat(variables('factoryId'), '/datasets/SQLTarget')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/onpremSQLDB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "onpremSQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "First_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Last_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Date",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Zipcode",
+						"type": "nchar"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[[dbo].[Testtb]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/onpremSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ContosoDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLStagePL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copyOnPremSQLDB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSetting"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "onpremSQLDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Parquetsink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "copyOnPremSQLDB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SQLDfTransformation",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"ParquetSource": {},
+									"sink1": {}
+								}
+							},
+							"staging": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onpremSQLDB')]",
+				"[concat(variables('factoryId'), '/datasets/Parquetsink')]",
+				"[concat(variables('factoryId'), '/dataflows/SQLDfTransformation')]"
+			]
+		}
+	]
+}
