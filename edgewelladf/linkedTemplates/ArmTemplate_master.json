@@ -33,6 +33,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'onpremSQL'"
 		},
+		"ContosoTargetConnection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ContosoTargetConnection'"
+		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://edgewellsta.dfs.core.windows.net"
@@ -75,6 +79,9 @@
 					},
 					"AzureSqlDatabase1_connectionString": {
 						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
+					},
+					"ContosoTargetConnection_connectionString": {
+						"value": "[parameters('ContosoTargetConnection_connectionString')]"
 					},
 					"SqlServer1_connectionString": {
 						"value": "[parameters('SqlServer1_connectionString')]"

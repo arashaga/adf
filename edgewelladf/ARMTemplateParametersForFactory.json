@@ -23,6 +23,9 @@
 		"onpremSQL_connectionString": {
 			"value": ""
 		},
+		"ContosoTargetConnection_connectionString": {
+			"value": ""
+		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 			"value": "https://edgewellsta.dfs.core.windows.net"
 		}

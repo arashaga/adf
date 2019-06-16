@@ -33,6 +33,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'onpremSQL'"
 		},
+		"ContosoTargetConnection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ContosoTargetConnection'"
+		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://edgewellsta.dfs.core.windows.net"
@@ -87,10 +91,7 @@
 											}
 										},
 										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSetting"
-											}
+											"type": "AzureSqlSink"
 										},
 										"enableStaging": false
 									},
@@ -103,7 +104,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "ContosoSink",
+											"referenceName": "ContosoSQLTarget",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -138,11 +139,16 @@
 						}
 					}
 				],
+				"parameters": {
+					"tableName": {
+						"type": "string"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ContosoDataset')]",
-				"[concat(variables('factoryId'), '/datasets/ContosoSink')]"
+				"[concat(variables('factoryId'), '/datasets/ContosoSQLTarget')]"
 			]
 		},
 		{
@@ -240,6 +246,9 @@
 					"referenceName": "SqlServer1",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Contoso"
+				},
 				"annotations": [],
 				"type": "SqlServerTable",
 				"schema": [],
@@ -257,6 +266,9 @@
 				"linkedServiceName": {
 					"referenceName": "AzureDataLakeStorageGen2",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Contoso"
 				},
 				"annotations": [],
 				"type": "Parquet",
@@ -519,18 +531,37 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
+			"name": "[concat(parameters('factoryName'), '/ContosoTargetConnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"type": "MappingDataFlow",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"sources": [],
-					"sinks": [],
-					"transformations": []
+					"connectionString": "[parameters('ContosoTargetConnection_connectionString')]"
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ContosoSQLTarget')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ContosoTargetConnection",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": "dummy"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ContosoTargetConnection')]"
+			]
 		}
 	]
 }
