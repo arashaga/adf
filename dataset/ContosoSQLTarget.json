@@ -1,0 +1,14 @@
+{
+	"name": "ContosoSQLTarget",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ContosoTargetConnection",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "dummy"
+		}
+	}
+}

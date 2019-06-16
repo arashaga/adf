@@ -38,10 +38,7 @@
 									}
 								},
 								"sink": {
-									"type": "ParquetSink",
-									"storeSettings": {
-										"type": "AzureBlobFSWriteSetting"
-									}
+									"type": "AzureSqlSink"
 								},
 								"enableStaging": false
 							},
@@ -53,7 +50,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ContosoSink",
+									"referenceName": "ContosoSQLTarget",
 									"type": "DatasetReference"
 								}
 							]
@@ -83,6 +80,11 @@
 					"firstRowOnly": false
 				}
 			}
-		]
+		],
+		"parameters": {
+			"tableName": {
+				"type": "string"
+			}
+		}
 	}
 }
