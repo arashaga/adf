@@ -80,11 +80,6 @@
 					"firstRowOnly": false
 				}
 			}
-		],
-		"parameters": {
-			"tableName": {
-				"type": "string"
-			}
-		}
+		]
 	}
 }
