@@ -17,13 +17,13 @@
 		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
+		"ContosoTargetConnection_connectionString": {
+			"value": ""
+		},
 		"SqlServer1_connectionString": {
 			"value": ""
 		},
 		"onpremSQL_connectionString": {
-			"value": ""
-		},
-		"ContosoTargetConnection_connectionString": {
 			"value": ""
 		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
