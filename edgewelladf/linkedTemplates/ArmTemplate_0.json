@@ -43,6 +43,36 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorageGen2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorageGen2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorageGen2_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/', parameters('integrationRuntime_edgewellIR'))]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -72,34 +102,42 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorageGen2')]",
+			"name": "[concat(parameters('factoryName'), '/onpremSQL')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureBlobFS",
+				"type": "SqlServer",
 				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorageGen2_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorageGen2_accountKey')]"
-					}
+					"connectionString": "[parameters('onpremSQL_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
+			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureSqlDatabase",
+				"type": "SqlServer",
 				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+					"connectionString": "[parameters('SqlServer1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SQLTarget')]",
@@ -192,41 +230,44 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/onpremSQL')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/SQLDfTransformation')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
+				"type": "MappingDataFlow",
 				"typeProperties": {
-					"connectionString": "[parameters('onpremSQL_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
-					"type": "IntegrationRuntimeReference"
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Parquetsink",
+								"type": "DatasetReference"
+							},
+							"name": "ParquetSource",
+							"typeProperties": {},
+							"script": "source(output(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SQLTarget",
+								"type": "DatasetReference"
+							},
+							"name": "sink1",
+							"script": "DerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1",
+							"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn1"
+						}
+					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('SqlServer1_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "[parameters('integrationRuntime_edgewellIntegrationRuntime')]",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/', parameters('integrationRuntime_edgewellIntegrationRuntime'))]"
+				"[concat(variables('factoryId'), '/datasets/Parquetsink')]",
+				"[concat(variables('factoryId'), '/datasets/SQLTarget')]"
 			]
 		},
 		{
@@ -286,47 +327,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SQLDfTransformation')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Parquetsink",
-								"type": "DatasetReference"
-							},
-							"name": "ParquetSource",
-							"typeProperties": {},
-							"script": "source(output(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "SQLTarget",
-								"type": "DatasetReference"
-							},
-							"name": "sink1",
-							"script": "DerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1",
-							"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn1"
-						}
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Parquetsink')]",
-				"[concat(variables('factoryId'), '/datasets/SQLTarget')]"
 			]
 		},
 		{
@@ -416,7 +416,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/ContosoPL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
