@@ -1,0 +1,15 @@
+{
+	"name": "SQLTarget",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "dbo.testtable"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,36 @@
+{
+	"name": "onpremSQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "onpremSQL",
+			"type": "LinkedServiceReference"
+		},
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "First_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Last_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Date",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Zipcode",
+				"type": "nchar"
+			}
+		],
+		"typeProperties": {
+			"tableName": "[dbo].[Testtb]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

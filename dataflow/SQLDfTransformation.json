@@ -1,0 +1,34 @@
+{
+	"name": "SQLDfTransformation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Parquetsink",
+						"type": "DatasetReference"
+					},
+					"name": "ParquetSource",
+					"script": "source(output(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SQLTarget",
+						"type": "DatasetReference"
+					},
+					"name": "sink1",
+					"script": "DerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1",
+					"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn1"
+				}
+			]
+		}
+	}
+}
