@@ -1,0 +1,22 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "ContosoSource",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100,\n\tmoveFiles: ['/Contoso','/Processed']) ~> ContosoSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ContosoSink",
+						"type": "DatasetReference"
+					},
+					"name": "ContosoSource2",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> ContosoSource2"
+				}
+			]
+		}
+	}
+}
