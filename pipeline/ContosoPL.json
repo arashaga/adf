@@ -15,7 +15,7 @@
 				],
 				"typeProperties": {
 					"items": {
-						"value": "@pipeline().parameters.tableList",
+						"value": "@activity('LookupAllContosoTables').output.value",
 						"type": "Expression"
 					},
 					"activities": [
@@ -83,11 +83,6 @@
 					"firstRowOnly": false
 				}
 			}
-		],
-		"parameters": {
-			"tableList": {
-				"type": "array"
-			}
-		}
+		]
 	}
 }
