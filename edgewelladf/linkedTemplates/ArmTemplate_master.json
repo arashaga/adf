@@ -17,10 +17,6 @@
 			"metadata": "Integration Runtime Name",
 			"defaultValue": "edgewellIntegrationRuntime"
 		},
-		"onpremSQL_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'onpremSQL'"
-		},
 		"AzureDataLakeStorageGen2_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageGen2'"
@@ -32,6 +28,10 @@
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
+		},
+		"onpremSQL_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'onpremSQL'"
 		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 			"type": "string",
@@ -76,11 +76,11 @@
 					"AzureSqlDatabase1_connectionString": {
 						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
 					},
-					"onpremSQL_connectionString": {
-						"value": "[parameters('onpremSQL_connectionString')]"
-					},
 					"SqlServer1_connectionString": {
 						"value": "[parameters('SqlServer1_connectionString')]"
+					},
+					"onpremSQL_connectionString": {
+						"value": "[parameters('onpremSQL_connectionString')]"
 					},
 					"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorageGen2_properties_typeProperties_url')]"

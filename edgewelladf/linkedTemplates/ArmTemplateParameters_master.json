@@ -11,9 +11,6 @@
 		"integrationRuntime_edgewellIntegrationRuntime": {
 			"value": "edgewellIntegrationRuntime"
 		},
-		"onpremSQL_connectionString": {
-			"value": ""
-		},
 		"AzureDataLakeStorageGen2_accountKey": {
 			"value": ""
 		},
@@ -21,6 +18,9 @@
 			"value": ""
 		},
 		"SqlServer1_connectionString": {
+			"value": ""
+		},
+		"onpremSQL_connectionString": {
 			"value": ""
 		},
 		"AzureDataLakeStorageGen2_properties_typeProperties_url": {
