@@ -6,9 +6,6 @@
 			"type": "LinkedServiceReference"
 		},
 		"type": "AzureSqlTable",
-		"schema": [],
-		"typeProperties": {
-			"tableName": "dummy"
-		}
+		"schema": []
 	}
 }

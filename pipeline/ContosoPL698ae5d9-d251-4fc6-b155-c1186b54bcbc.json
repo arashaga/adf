@@ -1,0 +1,169 @@
+{
+	"name": "ContosoPL698ae5d9-d251-4fc6-b155-c1186b54bcbc",
+	"properties": {
+		"activities": [
+			{
+				"name": "RetreiveAllTables_foreach",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupAllContosoTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupAllContosoTables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CopyContosoTables",
+							"type": "Copy",
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "SELECT * FROM [@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ContosoDataset",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ContosoSQLTarget",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "LookupAllContosoTables",
+				"type": "Lookup",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.TABLES WHERE TABLE_TYPE = 'BASE TABLE' "
+					},
+					"dataset": {
+						"referenceName": "ContosoDataset",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupAllContosoTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupAllContosoTables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy Data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GetMetadata1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": "SELECT * FROM [@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]"
+								},
+								"sink": {
+									"type": "AzureSqlSink"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ContosoDataset",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ContosoSQLTarget",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "GetMetadata1",
+							"type": "GetMetadata",
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ContosoDataset",
+									"type": "DatasetReference"
+								},
+								"fieldList": [
+									{
+										"value": "@activity('LookupAllContosoTables').output.value",
+										"type": "Expression"
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		]
+	}
+}
