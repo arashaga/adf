@@ -266,7 +266,10 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"tableName": "dummy"
+					"tableName": {
+						"value": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
