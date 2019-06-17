@@ -24,11 +24,11 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ContosoSink",
+						"referenceName": "ContosoCsvSkin",
 						"type": "DatasetReference"
 					},
 					"name": "sink1",
-					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionBy('hash', 1)) ~> sink1"
+					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1)) ~> sink1"
 				}
 			],
 			"transformations": [
@@ -46,19 +46,19 @@
 				},
 				{
 					"name": "Pivot1",
-					"script": "ConditionalSplit1@Professional pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), 0),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> Pivot1"
+					"script": "ConditionalSplit1@Professional pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0,2)),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> Pivot1"
 				},
 				{
 					"name": "GroupbyEducation",
-					"script": "ConditionalSplit1@SkilledManual pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), 0),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupbyEducation"
+					"script": "ConditionalSplit1@SkilledManual pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0,2)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupbyEducation"
 				},
 				{
 					"name": "GroupBy",
-					"script": "ConditionalSplit1@Management pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), 0),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupBy"
+					"script": "ConditionalSplit1@Management pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0,2)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupBy"
 				},
 				{
 					"name": "DerivedColumn2",
-					"script": "Join1 derive(SalesAmount = toInteger(SalesAmount)) ~> DerivedColumn2"
+					"script": "Join1 derive(SalesAmount = toDecimal(SalesAmount, 2)) ~> DerivedColumn2"
 				}
 			]
 		}
