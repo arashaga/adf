@@ -51,7 +51,13 @@
 							"outputs": [
 								{
 									"referenceName": "ContosoSQLTarget",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"tableName": {
+											"value": "[@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
