@@ -38,7 +38,11 @@
 									}
 								},
 								"sink": {
-									"type": "AzureSqlSink"
+									"type": "AzureSqlSink",
+									"sqlWriterStoredProcedureName": {
+										"value": "@pipeline().parameters.tableName",
+										"type": "Expression"
+									}
 								},
 								"enableStaging": false
 							},
@@ -80,6 +84,12 @@
 					"firstRowOnly": false
 				}
 			}
-		]
+		],
+		"parameters": {
+			"tableName": {
+				"type": "string",
+				"defaultValue": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')"
+			}
+		}
 	}
 }

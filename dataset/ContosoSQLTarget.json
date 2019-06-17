@@ -8,10 +8,7 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"tableName": {
-				"value": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')",
-				"type": "Expression"
-			}
+			"tableName": ""
 		}
 	}
 }
