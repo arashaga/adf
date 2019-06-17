@@ -24,11 +24,11 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DataFlowSink",
+						"referenceName": "ContosoCsvSkin",
 						"type": "DatasetReference"
 					},
 					"name": "sink1",
-					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink1"
+					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1)) ~> sink1"
 				}
 			],
 			"transformations": [
