@@ -91,11 +91,7 @@
 											}
 										},
 										"sink": {
-											"type": "AzureSqlSink",
-											"sqlWriterStoredProcedureName": {
-												"value": "@pipeline().parameters.tableName",
-												"type": "Expression"
-											}
+											"type": "AzureSqlSink"
 										},
 										"enableStaging": false
 									},
@@ -110,7 +106,12 @@
 										{
 											"referenceName": "ContosoSQLTarget",
 											"type": "DatasetReference",
-											"parameters": {}
+											"parameters": {
+												"tableName": {
+													"value": "[[@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]",
+													"type": "Expression"
+												}
+											}
 										}
 									]
 								}
@@ -143,12 +144,6 @@
 						}
 					}
 				],
-				"parameters": {
-					"tableName": {
-						"type": "string",
-						"defaultValue": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')"
-					}
-				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -243,6 +238,76 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ContosoFlowDemo",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "ContosoFlowDemo",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"sink1": {},
+									"sink2": {},
+									"sink3": {}
+								}
+							},
+							"staging": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/ContosoFlowDemo')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ContosoCsvSkin')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageGen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Contoso"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"container": "contoso"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageGen2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ContosoDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -272,11 +337,23 @@
 					"referenceName": "ContosoTargetConnection",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"tableName": {
+						"type": "string",
+						"defaultValue": "dummy"
+					}
+				},
+				"folder": {
+					"name": "Contoso"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"tableName": ""
+					"tableName": {
+						"value": "@dataset().tableName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -304,6 +381,316 @@
 						"container": "data"
 					},
 					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageGen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageGen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Contoso"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "customer.txt",
+						"container": "contoso"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerKey",
+						"type": "String"
+					},
+					{
+						"name": "GeographyKey",
+						"type": "String"
+					},
+					{
+						"name": "CustomerLabel",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "MiddleName",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "NameStyle",
+						"type": "String"
+					},
+					{
+						"name": "BirthDate",
+						"type": "String"
+					},
+					{
+						"name": "MaritalStatus",
+						"type": "String"
+					},
+					{
+						"name": "Suffix",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "String"
+					},
+					{
+						"name": "YearlyIncome",
+						"type": "String"
+					},
+					{
+						"name": "TotalChildren",
+						"type": "String"
+					},
+					{
+						"name": "NumberChildrenAtHome",
+						"type": "String"
+					},
+					{
+						"name": "Education",
+						"type": "String"
+					},
+					{
+						"name": "Occupation",
+						"type": "String"
+					},
+					{
+						"name": "HouseOwnerFlag",
+						"type": "String"
+					},
+					{
+						"name": "NumberCarsOwned",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "Phone",
+						"type": "String"
+					},
+					{
+						"name": "DateFirstPurchase",
+						"type": "String"
+					},
+					{
+						"name": "CustomerType",
+						"type": "String"
+					},
+					{
+						"name": "CompanyName",
+						"type": "String"
+					},
+					{
+						"name": "ETLLoadID",
+						"type": "String"
+					},
+					{
+						"name": "LoadDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdateDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageGen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactOnlineSales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ContosoTargetConnection",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "OnlineSalesKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DateKey",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "StoreKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PromotionKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CurrencyKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesOrderLineNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesQuantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesAmount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "ReturnQuantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ReturnAmount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "DiscountQuantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DiscountAmount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalCost",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitCost",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "ETLLoadID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "LoadDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UpdateDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"tableName": "[[dbo].[FactOnlineSales]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ContosoTargetConnection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactOnlineSalesSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorageGen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "factonlinesales.txt",
+						"container": "contoso"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
 				},
 				"schema": []
 			},
@@ -528,6 +915,93 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ContosoFlowDemo')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CustomerData",
+								"type": "DatasetReference"
+							},
+							"name": "source1",
+							"typeProperties": {},
+							"script": "source(output(\n\t\tCustomerKey as string,\n\t\tGeographyKey as string,\n\t\tCustomerLabel as string,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tNameStyle as string,\n\t\tBirthDate as string,\n\t\tMaritalStatus as string,\n\t\tSuffix as string,\n\t\tGender as string,\n\t\tEmailAddress as string,\n\t\tYearlyIncome as string,\n\t\tTotalChildren as string,\n\t\tNumberChildrenAtHome as string,\n\t\tEducation as string,\n\t\tOccupation as string,\n\t\tHouseOwnerFlag as string,\n\t\tNumberCarsOwned as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tPhone as string,\n\t\tDateFirstPurchase as string,\n\t\tCustomerType as string,\n\t\tCompanyName as string,\n\t\tETLLoadID as string,\n\t\tLoadDate as string,\n\t\tUpdateDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "FactOnlineSales",
+								"type": "DatasetReference"
+							},
+							"name": "source2",
+							"typeProperties": {},
+							"script": "source(output(\n\t\tStoreKey as integer,\n\t\tProductKey as integer,\n\t\tCustomerKey as integer,\n\t\tSalesOrderNumber as string,\n\t\tSalesOrderLineNumber as integer,\n\t\tSalesQuantity as integer,\n\t\tSalesAmount as decimal(19,4),\n\t\tReturnQuantity as integer,\n\t\tReturnAmount as decimal(19,4),\n\t\tDiscountQuantity as integer,\n\t\tDiscountAmount as decimal(19,4),\n\t\tTotalCost as decimal(19,4),\n\t\tUnitCost as decimal(19,4),\n\t\tUnitPrice as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 10,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select       StoreKey\\n      , ProductKey\\n      , CustomerKey\\n      , SalesOrderNumber\\n      , SalesOrderLineNumber\\n      , SalesQuantity\\n      , SalesAmount\\n      , ReturnQuantity\\n      , ReturnAmount\\n      , DiscountQuantity\\n      , DiscountAmount\\n      , TotalCost\\n      , UnitCost\\n      , UnitPrice from FactOnlineSales',\n\tformat: 'query',\n\twildcardPaths:['factonlinesales.txt']) ~> source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DataFlowSink",
+								"type": "DatasetReference"
+							},
+							"name": "sink1",
+							"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true) ~> sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataFlowSink",
+								"type": "DatasetReference"
+							},
+							"name": "sink2",
+							"script": "GroupbyEducation sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink2"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataFlowSink",
+								"type": "DatasetReference"
+							},
+							"name": "sink3",
+							"script": "GroupBy sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink3"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1",
+							"script": "source1 derive(CustomerKey = toInteger(CustomerKey),\n\t\tGeographyKey = toInteger(GeographyKey),\n\t\tNameStyle = toBoolean(NameStyle),\n\t\tBirthDate = toDate(BirthDate),\n\t\tYearlyIncome = toDecimal(YearlyIncome),\n\t\tTotalChildren = toInteger(TotalChildren),\n\t\tNumberChildrenAtHome = toInteger(NumberChildrenAtHome),\n\t\tDateFirstPurchase = toDate(DateFirstPurchase),\n\t\tLoadDate = toDate(LoadDate),\n\t\tUpdateDate = toDate(UpdateDate)) ~> DerivedColumn1"
+						},
+						{
+							"name": "Join1",
+							"script": "DerivedColumn1, source2 join(toInteger(DerivedColumn1@CustomerKey) == source2@CustomerKey,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1"
+						},
+						{
+							"name": "ConditionalSplit1",
+							"script": "Join1 split(Occupation =='Professional',\n\tOccupation == 'Skilled Manual',\n\tOccupation == 'Management',\n\tdisjoint: false) ~> ConditionalSplit1@(Professional, SkilledManual, Management)"
+						},
+						{
+							"name": "Pivot1",
+							"script": "ConditionalSplit1@Professional pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> Pivot1"
+						},
+						{
+							"name": "GroupbyEducation",
+							"script": "ConditionalSplit1@SkilledManual pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupbyEducation"
+						},
+						{
+							"name": "GroupBy",
+							"script": "ConditionalSplit1@Management pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupBy"
+						}
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerData')]",
+				"[concat(variables('factoryId'), '/datasets/FactOnlineSales')]",
+				"[concat(variables('factoryId'), '/datasets/DataFlowSink')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SQLDfTransformation')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -566,6 +1040,29 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Parquetsink')]",
 				"[concat(variables('factoryId'), '/datasets/SQLTarget')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Contoso"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": "[[dbo].[SalesAmountTable]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		}
 	]
