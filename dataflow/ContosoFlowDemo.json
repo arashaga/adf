@@ -1,0 +1,32 @@
+{
+	"name": "ContosoFlowDemo",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CustomerData",
+						"type": "DatasetReference"
+					},
+					"name": "source1",
+					"script": "source(output(\n\t\tCustomerKey as string,\n\t\tGeographyKey as string,\n\t\tCustomerLabel as string,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tNameStyle as string,\n\t\tBirthDate as string,\n\t\tMaritalStatus as string,\n\t\tSuffix as string,\n\t\tGender as string,\n\t\tEmailAddress as string,\n\t\tYearlyIncome as string,\n\t\tTotalChildren as string,\n\t\tNumberChildrenAtHome as string,\n\t\tEducation as string,\n\t\tOccupation as string,\n\t\tHouseOwnerFlag as string,\n\t\tNumberCarsOwned as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tPhone as string,\n\t\tDateFirstPurchase as string,\n\t\tCustomerType as string,\n\t\tCompanyName as string,\n\t\tETLLoadID as string,\n\t\tLoadDate as string,\n\t\tUpdateDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "FactOnlineSalesSource",
+						"type": "DatasetReference"
+					},
+					"name": "source2",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> source2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1",
+					"script": "source1 derive(CustomerKey = toInteger(CustomerKey),\n\t\tGeographyKey = toInteger(GeographyKey),\n\t\tNameStyle = toBoolean(NameStyle),\n\t\tBirthDate = toDate(BirthDate),\n\t\tYearlyIncome = toDecimal(YearlyIncome),\n\t\tTotalChildren = toInteger(TotalChildren),\n\t\tNumberChildrenAtHome = toInteger(NumberChildrenAtHome),\n\t\tDateFirstPurchase = toDate(DateFirstPurchase),\n\t\tLoadDate = toDate(LoadDate),\n\t\tUpdateDate = toDate(UpdateDate)) ~> DerivedColumn1"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,24 @@
+{
+	"name": "FactOnlineSalesSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorageGen2",
+			"type": "LinkedServiceReference"
+		},
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "factonlinesales.zip",
+				"container": "contoso"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "bzip2",
+			"compressionLevel": "Fastest",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
