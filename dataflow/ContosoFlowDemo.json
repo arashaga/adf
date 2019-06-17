@@ -24,11 +24,11 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "Parquetsink",
+						"referenceName": "ContosoCsvSkin",
 						"type": "DatasetReference"
 					},
 					"name": "sink1",
-					"script": "Pivot1 sink(input(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionBy('hash', 1)) ~> sink1"
+					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1),\n\ttruncate:true) ~> sink1"
 				}
 			],
 			"transformations": [
