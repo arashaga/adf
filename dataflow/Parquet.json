@@ -1,0 +1,9 @@
+{
+	"name": "Parquet",
+	"properties": {
+		"folder": {
+			"name": "Contoso"
+		},
+		"type": "MappingDataFlow"
+	}
+}

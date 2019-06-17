@@ -5,13 +5,13 @@
 			"referenceName": "ContosoTargetConnection",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Contoso"
+		},
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"tableName": {
-				"value": "@pipeline().parameters.tableName",
-				"type": "Expression"
-			}
+			"tableName": ""
 		}
 	}
 }
