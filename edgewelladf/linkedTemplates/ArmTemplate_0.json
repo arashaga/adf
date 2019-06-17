@@ -735,27 +735,11 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "DataFlowSink",
+								"referenceName": "ContosoCsvSkin",
 								"type": "DatasetReference"
 							},
 							"name": "sink1",
-							"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink1"
-						},
-						{
-							"dataset": {
-								"referenceName": "DataFlowSink",
-								"type": "DatasetReference"
-							},
-							"name": "sink2",
-							"script": "GroupbyEducation sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink2"
-						},
-						{
-							"dataset": {
-								"referenceName": "DataFlowSink",
-								"type": "DatasetReference"
-							},
-							"name": "sink3",
-							"script": "GroupBy sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink3"
+							"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1),\n\ttruncate:true) ~> sink1"
 						}
 					],
 					"transformations": [
@@ -773,7 +757,7 @@
 						},
 						{
 							"name": "Pivot1",
-							"script": "ConditionalSplit1@Professional pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> Pivot1"
+							"script": "ConditionalSplit1@Professional pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> Pivot1"
 						},
 						{
 							"name": "GroupbyEducation",
@@ -789,7 +773,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CustomerData')]",
 				"[concat(variables('factoryId'), '/datasets/FactOnlineSales')]",
-				"[concat(variables('factoryId'), '/datasets/DataFlowSink')]"
+				"[concat(variables('factoryId'), '/datasets/ContosoCsvSkin')]"
 			]
 		},
 		{
