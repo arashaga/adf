@@ -9,12 +9,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "factonlinesales.zip",
+				"fileName": "factonlinesales.txt",
 				"container": "contoso"
 			},
 			"columnDelimiter": ",",
-			"compressionCodec": "bzip2",
-			"compressionLevel": "Fastest",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
