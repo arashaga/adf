@@ -5,13 +5,22 @@
 			"referenceName": "ContosoTargetConnection",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"tableName": {
+				"type": "string",
+				"defaultValue": "dummy"
+			}
+		},
 		"folder": {
 			"name": "Contoso"
 		},
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"tableName": ""
+			"tableName": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
 		}
 	}
 }

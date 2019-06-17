@@ -38,19 +38,7 @@
 									}
 								},
 								"sink": {
-									"type": "DelimitedTextSink",
-									"storeSettings": {
-										"type": "AzureBlobFSWriteSetting",
-										"copyBehavior": {
-											"value": "@pipeline().parameters.tableName",
-											"type": "Expression"
-										}
-									},
-									"formatSettings": {
-										"type": "DelimitedTextWriteSetting",
-										"quoteAllText": true,
-										"fileExtension": ".txt"
-									}
+									"type": "AzureSqlSink"
 								},
 								"enableStaging": false
 							},
@@ -62,7 +50,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ContosoCsvSkin",
+									"referenceName": "ContosoSQLTarget",
 									"type": "DatasetReference"
 								}
 							]
