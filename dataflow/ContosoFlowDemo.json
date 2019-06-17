@@ -24,17 +24,17 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ContosoSink",
+						"referenceName": "ContosoCsvSkin",
 						"type": "DatasetReference"
 					},
 					"name": "sink1",
-					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionBy('hash', 1)) ~> sink1"
+					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1)) ~> sink1"
 				}
 			],
 			"transformations": [
 				{
 					"name": "DerivedColumn1",
-					"script": "source1 derive(CustomerKey = toInteger(CustomerKey),\n\t\tGeographyKey = toInteger(GeographyKey),\n\t\tNameStyle = toBoolean(NameStyle),\n\t\tBirthDate = toDate(BirthDate),\n\t\tYearlyIncome = toDecimal(YearlyIncome),\n\t\tTotalChildren = toInteger(TotalChildren),\n\t\tNumberChildrenAtHome = toInteger(NumberChildrenAtHome),\n\t\tDateFirstPurchase = toDate(DateFirstPurchase),\n\t\tLoadDate = toDate(LoadDate),\n\t\tUpdateDate = toDate(UpdateDate)) ~> DerivedColumn1"
+					"script": "source1 derive(CustomerKey = toInteger(CustomerKey),\n\t\tGeographyKey = toInteger(GeographyKey),\n\t\tNameStyle = toBoolean(NameStyle),\n\t\tBirthDate = toDate(BirthDate),\n\t\tYearlyIncome = toInteger(YearlyIncome),\n\t\tTotalChildren = toInteger(TotalChildren),\n\t\tNumberChildrenAtHome = toInteger(NumberChildrenAtHome),\n\t\tDateFirstPurchase = toDate(DateFirstPurchase),\n\t\tLoadDate = toDate(LoadDate),\n\t\tUpdateDate = toDate(UpdateDate)) ~> DerivedColumn1"
 				},
 				{
 					"name": "Join1",
