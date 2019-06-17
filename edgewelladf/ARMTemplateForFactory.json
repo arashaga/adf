@@ -91,7 +91,11 @@
 											}
 										},
 										"sink": {
-											"type": "AzureSqlSink"
+											"type": "AzureSqlSink",
+											"sqlWriterStoredProcedureName": {
+												"value": "@pipeline().parameters.tableName",
+												"type": "Expression"
+											}
 										},
 										"enableStaging": false
 									},
@@ -139,6 +143,12 @@
 						}
 					}
 				],
+				"parameters": {
+					"tableName": {
+						"type": "string",
+						"defaultValue": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -266,10 +276,7 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"tableName": {
-						"value": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')",
-						"type": "Expression"
-					}
+					"tableName": ""
 				}
 			},
 			"dependsOn": [
