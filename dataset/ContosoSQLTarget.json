@@ -8,7 +8,10 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"tableName": ""
+			"tableName": {
+				"value": "@pipeline().parameters.tableName",
+				"type": "Expression"
+			}
 		}
 	}
 }

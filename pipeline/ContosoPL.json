@@ -39,10 +39,7 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"sqlWriterStoredProcedureName": {
-										"value": "@pipeline().parameters.tableName",
-										"type": "Expression"
-									}
+									"sqlWriterStoredProcedureName": ""
 								},
 								"enableStaging": false
 							},
