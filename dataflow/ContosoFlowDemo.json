@@ -24,11 +24,11 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ContosoCsvSkin",
+						"referenceName": "ContosoSink",
 						"type": "DatasetReference"
 					},
 					"name": "sink1",
-					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionFileNames:['sink.csv'],\n\tpartitionBy('hash', 1)) ~> sink1"
+					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tpartitionBy('hash', 1)) ~> sink1"
 				}
 			],
 			"transformations": [
@@ -42,7 +42,7 @@
 				},
 				{
 					"name": "ConditionalSplit1",
-					"script": "Join1 split(Occupation =='Professional',\n\tOccupation == 'Skilled Manual',\n\tOccupation == 'Management',\n\tdisjoint: false) ~> ConditionalSplit1@(Professional, SkilledManual, Management)"
+					"script": "DerivedColumn2 split(Occupation =='Professional',\n\tOccupation == 'Skilled Manual',\n\tOccupation == 'Management',\n\tdisjoint: false) ~> ConditionalSplit1@(Professional, SkilledManual, Management)"
 				},
 				{
 					"name": "Pivot1",
@@ -55,6 +55,10 @@
 				{
 					"name": "GroupBy",
 					"script": "ConditionalSplit1@Management pivot(groupBy(Gender,\n\t\tOccupation),\n\tpivotBy(Education),\n\tiif(isNull(sum(SalesAmount)) == false(), sum(SalesAmount), toDecimal(0)),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> GroupBy"
+				},
+				{
+					"name": "DerivedColumn2",
+					"script": "Join1 derive(SalesAmount = toInteger(SalesAmount)) ~> DerivedColumn2"
 				}
 			]
 		}
