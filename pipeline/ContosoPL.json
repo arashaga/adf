@@ -38,8 +38,19 @@
 									}
 								},
 								"sink": {
-									"type": "AzureSqlSink",
-									"sqlWriterStoredProcedureName": ""
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSetting",
+										"copyBehavior": {
+											"value": "@pipeline().parameters.tableName",
+											"type": "Expression"
+										}
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSetting",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
 								},
 								"enableStaging": false
 							},
@@ -51,7 +62,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ContosoSQLTarget",
+									"referenceName": "ContosoCsvSkin",
 									"type": "DatasetReference"
 								}
 							]
@@ -81,12 +92,6 @@
 					"firstRowOnly": false
 				}
 			}
-		],
-		"parameters": {
-			"tableName": {
-				"type": "string",
-				"defaultValue": "concat( '[',@{item().TABLE_SCHEMA},']','.','[',@{item().TABLE_NAME},']')"
-			}
-		}
+		]
 	}
 }
