@@ -29,22 +29,6 @@
 					},
 					"name": "sink1",
 					"script": "Pivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink1"
-				},
-				{
-					"dataset": {
-						"referenceName": "DataFlowSink",
-						"type": "DatasetReference"
-					},
-					"name": "sink2",
-					"script": "GroupbyEducation sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink2"
-				},
-				{
-					"dataset": {
-						"referenceName": "DataFlowSink",
-						"type": "DatasetReference"
-					},
-					"name": "sink3",
-					"script": "GroupBy sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false) ~> sink3"
 				}
 			],
 			"transformations": [
