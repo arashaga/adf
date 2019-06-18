@@ -1,5 +1,5 @@
 {
-	"name": "SQLStagePL",
+	"name": "DataFlowDerivedCol",
 	"properties": {
 		"activities": [
 			{
