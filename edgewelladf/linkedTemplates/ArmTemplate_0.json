@@ -805,13 +805,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "sink1",
-							"script": "DerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
+							"script": "DerivedColumn sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'table',\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ID']) ~> sink1"
 						}
 					],
 					"transformations": [
 						{
-							"name": "DerivedColumn1",
-							"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn1"
+							"name": "DerivedColumn",
+							"script": "ParquetSource derive(ID = toInteger(ID),\n\t\tFirst_Name = toString(First_Name),\n\t\tLast_Name = toString(Last_Name),\n\t\tDate = toDate(Date, 'yyyyMMdd'),\n\t\tZipcode = toInteger(Zipcode),\n\tpartitionBy('hash', 1)) ~> DerivedColumn"
 						}
 					]
 				}
