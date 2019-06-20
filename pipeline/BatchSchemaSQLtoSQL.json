@@ -43,7 +43,10 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"command": "python schema.py schema.json conf.jaon",
+					"command": {
+						"value": "python.exe @activity('Lookup1').output.value conf.json",
+						"type": "Expression"
+					},
 					"resourceLinkedService": {
 						"referenceName": "AzureBlobStorage1",
 						"type": "LinkedServiceReference"
