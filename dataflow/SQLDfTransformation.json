@@ -6,11 +6,11 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "Parquetsink",
+						"referenceName": "ContosoCsvSkin",
 						"type": "DatasetReference"
 					},
 					"name": "ParquetSource",
-					"script": "source(output(\n\t\tID as string,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tDate as string,\n\t\tZipcode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> ParquetSource"
 				}
 			],
 			"sinks": [
